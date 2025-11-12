@@ -9,6 +9,15 @@
     <p class="mb-0">Seleccione una habitación para ver más detalles</p>
 </div>
 
+@if (!ViewBag.HayClientes)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Atención:</strong> No hay clientes registrados en el sistema. Debe agregar al menos un cliente antes de poder realizar reservas.
+        <a asp-controller="Cliente" asp-action="Index" class="alert-link">Ir a Clientes</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 @if (Model.Any())
 {
     <div class="row">
@@ -27,9 +36,23 @@
                             <strong>Capacidad:</strong> @item.Capacidad personas<br>
                             <strong>Precio:</strong> <span class="habitacion-precio">@item.PrecioPorNoche.ToString("C")</span> por noche
                         </div>
-                        <a asp-action="Detalles" asp-route-id="@item.Id" class="btn btn-primary w-100">
-                            Ver Detalles
-                        </a>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Detalles" asp-route-id="@item.Id" class="btn btn-info flex-fill">
+                                Ver Detalles
+                            </a>
+                            @if (ViewBag.HayClientes)
+                            {
+                                <a asp-action="ReservarHabitacion" asp-route-id="@item.Id" class="btn btn-primary flex-fill">
+                                    Reservar
+                                </a>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary flex-fill" disabled title="No hay clientes registrados">
+                                    Reservar
+                                </button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

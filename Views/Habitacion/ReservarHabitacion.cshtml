@@ -1,0 +1,275 @@
+@using biblioteca_hotel.Clases
+@{
+    ViewData["Title"] = "Reservar Habitación";
+    var habitacion = ViewBag.Habitacion as Habitacion;
+}
+
+<div class="page-header">
+    <h2>Reservar Habitación</h2>
+    <p class="mb-0">Complete la información para realizar la reserva</p>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+<div class="row">
+    <!-- Información de la Habitación -->
+    <div class="col-md-4 mb-4">
+        <div class="card" style="position: sticky; top: 20px;">
+            <div class="card-header">
+                <h5 class="mb-0">Habitación Seleccionada</h5>
+            </div>
+            <div class="card-body">
+                <span class="habitacion-tipo @habitacion.Tipo.ToLower()">@habitacion.Tipo</span>
+                <h3 class="mt-2">Habitación @habitacion.Numero</h3>
+                <p class="text-muted">@habitacion.Descripcion</p>
+                <hr>
+                <div class="mb-2">
+                    <strong>Capacidad:</strong> @habitacion.Capacidad personas
+                </div>
+                @if (habitacion is Sencilla sencilla)
+                {
+                    <div class="mb-2">
+                        <strong>Tipo de Cama:</strong> @(sencilla.TipoCama?.Nombre ?? "N/A")
+                    </div>
+                    <div class="mb-2">
+                        <strong>Número de Camas:</strong> @sencilla.NumeroCamas
+                    </div>
+                }
+                else if (habitacion is Ejecutiva ejecutiva)
+                {
+                    <div class="mb-2">
+                        <strong>Tipo de Cama:</strong> @(ejecutiva.TipoCama?.Nombre ?? "N/A")
+                    </div>
+                    <div class="mb-2">
+                        <strong>Número de Camas:</strong> @ejecutiva.NumeroCamas
+                    </div>
+                }
+                else if (habitacion is Suite suite)
+                {
+                    <div class="mb-2">
+                        <strong>Tipo de Cama:</strong> @(suite.TipoCama?.Nombre ?? "N/A")
+                    </div>
+                    <div class="mb-2">
+                        <strong>Número de Camas:</strong> @suite.NumeroCamas
+                    </div>
+                }
+                <div class="habitacion-precio mt-3">
+                    @habitacion.PrecioPorNoche.ToString("C")
+                </div>
+                <small class="text-muted">por noche</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Reserva -->
+    <div class="col-md-8">
+        <div class="form-section">
+            <form asp-action="ReservarHabitacion" method="post" id="reservaForm">
+                <input type="hidden" name="habitacionId" value="@habitacion.Id" />
+
+                <h4>Seleccionar Cliente</h4>
+
+                <div class="mb-4">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="opcionCliente" id="clienteExistente"
+                               value="existente" checked onchange="toggleClienteForm()">
+                        <label class="form-check-label" for="clienteExistente">
+                            <strong>Cliente Existente</strong>
+                        </label>
+                    </div>
+
+                    <div id="clienteExistenteSection" class="ms-4 mb-4">
+                        <label for="clienteExistenteId" class="form-label">Seleccione el Cliente <span class="text-danger">*</span></label>
+                        <select name="clienteExistenteId" id="clienteExistenteId" class="form-control">
+                            <option value="">Seleccione un cliente...</option>
+                            @foreach (var cliente in ViewBag.Clientes)
+                            {
+                                <option value="@cliente.IdCliente">@cliente.Nombre @cliente.Apellido - @cliente.TipoDocumento.Nombre: @cliente.NumeroDocumento</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="opcionCliente" id="clienteNuevo"
+                               value="nuevo" onchange="toggleClienteForm()">
+                        <label class="form-check-label" for="clienteNuevo">
+                            <strong>Registrar Nuevo Cliente</strong>
+                        </label>
+                    </div>
+
+                    <div id="clienteNuevoSection" class="ms-4 mb-4" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoNombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" name="nuevoNombre" id="nuevoNombre" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoApellido" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" name="nuevoApellido" id="nuevoApellido" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoTipoDocumento" class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+                                <select name="nuevoTipoDocumento" id="nuevoTipoDocumento" class="form-control">
+                                    <option value="">Seleccione...</option>
+                                    <option value="CC">Cédula de Ciudadanía</option>
+                                    <option value="CE">Cédula de Extranjería</option>
+                                    <option value="Pasaporte">Pasaporte</option>
+                                    <option value="NIT">NIT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoNumeroDocumento" class="form-label">Número de Documento <span class="text-danger">*</span></label>
+                                <input type="text" name="nuevoNumeroDocumento" id="nuevoNumeroDocumento" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoTelefono" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="tel" name="nuevoTelefono" id="nuevoTelefono" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nuevoEmail" class="form-label">Email</label>
+                                <input type="email" name="nuevoEmail" id="nuevoEmail" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Información de la Estadía</h4>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="fechaEntrada" class="form-label">Fecha de Entrada <span class="text-danger">*</span></label>
+                        <input type="date" name="fechaEntrada" class="form-control" id="fechaEntrada"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="fechaSalida" class="form-label">Fecha de Salida <span class="text-danger">*</span></label>
+                        <input type="date" name="fechaSalida" class="form-control" id="fechaSalida" required />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="numHuespedes" class="form-label">Número de Huéspedes <span class="text-danger">*</span></label>
+                        <input type="number" name="numHuespedes" class="form-control" id="numHuespedes"
+                               min="1" max="@habitacion.Capacidad" value="1" required />
+                        <small class="form-text text-muted">Máximo: @habitacion.Capacidad personas</small>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Confirmar Reserva</button>
+                    <a asp-action="Disponibles" class="btn btn-secondary btn-lg">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleClienteForm() {
+            const clienteExistente = document.getElementById('clienteExistente').checked;
+            const existenteSection = document.getElementById('clienteExistenteSection');
+            const nuevoSection = document.getElementById('clienteNuevoSection');
+
+            if (clienteExistente) {
+                existenteSection.style.display = 'block';
+                nuevoSection.style.display = 'none';
+
+                // Hacer campos de cliente existente requeridos
+                document.getElementById('clienteExistenteId').required = true;
+
+                // Remover required de campos de cliente nuevo
+                document.getElementById('nuevoNombre').required = false;
+                document.getElementById('nuevoApellido').required = false;
+                document.getElementById('nuevoTipoDocumento').required = false;
+                document.getElementById('nuevoNumeroDocumento').required = false;
+                document.getElementById('nuevoTelefono').required = false;
+            } else {
+                existenteSection.style.display = 'none';
+                nuevoSection.style.display = 'block';
+
+                // Remover required de cliente existente
+                document.getElementById('clienteExistenteId').required = false;
+
+                // Hacer campos de cliente nuevo requeridos
+                document.getElementById('nuevoNombre').required = true;
+                document.getElementById('nuevoApellido').required = true;
+                document.getElementById('nuevoTipoDocumento').required = true;
+                document.getElementById('nuevoNumeroDocumento').required = true;
+                document.getElementById('nuevoTelefono').required = true;
+            }
+        }
+
+        // Validación de fechas
+        document.getElementById('fechaEntrada').addEventListener('change', function() {
+            const fechaEntrada = new Date(this.value);
+            const fechaSalida = document.getElementById('fechaSalida');
+            fechaSalida.min = this.value;
+
+            if (fechaSalida.value && new Date(fechaSalida.value) <= fechaEntrada) {
+                fechaSalida.value = '';
+            }
+        });
+
+        // Validación del formulario
+        document.getElementById('reservaForm').addEventListener('submit', function(e) {
+            const fechaEntrada = new Date(document.getElementById('fechaEntrada').value);
+            const fechaSalida = new Date(document.getElementById('fechaSalida').value);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            if (fechaEntrada < hoy) {
+                e.preventDefault();
+                alert('La fecha de entrada no puede ser anterior a hoy');
+                return false;
+            }
+
+            if (fechaEntrada >= fechaSalida) {
+                e.preventDefault();
+                alert('La fecha de entrada debe ser anterior a la fecha de salida');
+                return false;
+            }
+
+            const clienteExistente = document.getElementById('clienteExistente').checked;
+
+            if (clienteExistente) {
+                const clienteId = document.getElementById('clienteExistenteId').value;
+                if (!clienteId) {
+                    e.preventDefault();
+                    alert('Debe seleccionar un cliente');
+                    return false;
+                }
+            } else {
+                const nombre = document.getElementById('nuevoNombre').value.trim();
+                const apellido = document.getElementById('nuevoApellido').value.trim();
+                const tipoDoc = document.getElementById('nuevoTipoDocumento').value;
+                const numDoc = document.getElementById('nuevoNumeroDocumento').value.trim();
+                const telefono = document.getElementById('nuevoTelefono').value.trim();
+
+                if (!nombre || !apellido || !tipoDoc || !numDoc || !telefono) {
+                    e.preventDefault();
+                    alert('Debe completar todos los campos obligatorios del nuevo cliente');
+                    return false;
+                }
+            }
+
+            const numHuespedes = parseInt(document.getElementById('numHuespedes').value);
+            const capacidad = @habitacion.Capacidad;
+
+            if (numHuespedes > capacidad) {
+                e.preventDefault();
+                alert(`El número de huéspedes no puede exceder la capacidad de la habitación (${capacidad})`);
+                return false;
+            }
+        });
+
+        // Inicializar el formulario
+        toggleClienteForm();
+    </script>
+}

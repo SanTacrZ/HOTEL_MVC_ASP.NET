@@ -52,8 +52,7 @@ namespace hotel_web_final
                 try
                 {
                     var clienteService = services.GetRequiredService<ClienteService>();
-                    // --- CORRECCIÓN 2: Typo "Arhivos" -> "Archivos" ---
-                    var rutaClientes = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "Clientes.txt");
+                    var rutaClientes = Path.Combine(Directory.GetCurrentDirectory(), "Arhivos", "Clientes.txt");
                     if (File.Exists(rutaClientes))
                     {
                         clienteService.Cargar(rutaClientes);
@@ -73,8 +72,7 @@ namespace hotel_web_final
                 try
                 {
                     var huespedService = services.GetRequiredService<HuespedService>();
-                    // --- CORRECCIÓN 2: Typo "Arhivos" -> "Archivos" ---
-                    var rutaHuespedes = Path.Combine(Directory.GetCurrentDirectory(), "Archivos", "Huespedes.txt");
+                    var rutaHuespedes = Path.Combine(Directory.GetCurrentDirectory(), "Arhivos", "Huespedes.txt");
                     if (File.Exists(rutaHuespedes))
                     {
                         huespedService.Cargar(rutaHuespedes);

@@ -1,0 +1,7 @@
+# Archivo de Clientes
+# Formato: TipoDocumento|NumeroDocumento|Nombre|Apellido|Telefono|Email|NumeroTarjetaCredito|TipoCliente|Preferencias
+CC|1234567890|Juan|Pérez|3001234567|juan.perez@email.com|4532123456789012|Regular|Habitación con vista
+CC|9876543210|María|González|3109876543|maria.gonzalez@email.com|5412987654321098|VIP|No fumador
+Pasaporte|AB123456|John|Smith|3201122334|john.smith@email.com|4716543210987654|Internacional|Desayuno incluido
+CE|7654321098|Ana|Rodríguez|3157654321|ana.rodriguez@email.com|4024567890123456|Regular|Piso alto
+CC|5432109876|Carlos|Martínez|3005432109|carlos.martinez@email.com|3782456789012345|VIP|Suite ejecutiva
