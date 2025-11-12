@@ -1,0 +1,53 @@
+@model biblioteca_hotel.Clases.Reserva
+
+@{
+    ViewData["Title"] = "Detalles de Reserva";
+}
+
+<h2>Detalles de Reserva #@Model.Id</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID Reserva</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+        <dt class="col-sm-2">Cliente</dt>
+        <dd class="col-sm-10">@Model.Cliente?.Nombre @Model.Cliente?.Apellido</dd>
+        <dt class="col-sm-2">Fecha Entrada</dt>
+        <dd class="col-sm-10">@Model.FechaEntrada.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Fecha Salida</dt>
+        <dd class="col-sm-10">@Model.FechaSalida.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Número de Huéspedes</dt>
+        <dd class="col-sm-10">@Model.NumHuespedes</dd>
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">
+            <span class="badge @(Model.Estado?.Nombre == "Confirmada" ? "bg-success" : Model.Estado?.Nombre == "Cancelada" ? "bg-danger" : "bg-warning")">
+                @Model.Estado?.Nombre
+            </span>
+        </dd>
+        <dt class="col-sm-2">Precio Total</dt>
+        <dd class="col-sm-10">@Model.PrecioTotal.ToString("C")</dd>
+        <dt class="col-sm-2">Habitaciones</dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var hab in Model.Habitaciones)
+                {
+                    <li>@hab.Numero - @hab.Tipo (@hab.Estado)</li>
+                }
+            </ul>
+        </dd>
+        <dt class="col-sm-2">Huéspedes</dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var huesped in Model.Huespedes)
+                {
+                    <li>@huesped.Nombre @huesped.Apellido - @huesped.Nacionalidad</li>
+                }
+            </ul>
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a>
+</div>
+

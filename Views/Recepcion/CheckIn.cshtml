@@ -1,0 +1,39 @@
+@model biblioteca_hotel.Clases.Reserva
+
+@{
+    ViewData["Title"] = "Check-In";
+}
+
+<h2>Check-In - Reserva #@Model.Id</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Cliente</dt>
+        <dd class="col-sm-10">@Model.Cliente?.Nombre @Model.Cliente?.Apellido</dd>
+        <dt class="col-sm-2">Fecha Entrada</dt>
+        <dd class="col-sm-10">@Model.FechaEntrada.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Fecha Salida</dt>
+        <dd class="col-sm-10">@Model.FechaSalida.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-2">Habitaciones</dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var hab in Model.Habitaciones)
+                {
+                    <li>@hab.Numero - @hab.Tipo</li>
+                }
+            </ul>
+        </dd>
+    </dl>
+</div>
+
+<form asp-action="CheckIn" method="post">
+    <input type="hidden" name="reservaId" value="@Model.Id" />
+    <button type="submit" class="btn btn-primary">Confirmar Check-In</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+

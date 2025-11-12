@@ -1,0 +1,28 @@
+@model biblioteca_hotel.Clases.Huesped
+
+@{
+    ViewData["Title"] = "Eliminar Huésped";
+}
+
+<h2>Eliminar Huésped</h2>
+
+<h3>¿Está seguro que desea eliminar este huésped?</h3>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.IdHuesped</dd>
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Nombre @Model.Apellido</dd>
+        <dt class="col-sm-2">Documento</dt>
+        <dd class="col-sm-10">@Model.TipoDocumento?.Nombre - @Model.NumeroDocumento</dd>
+        <dt class="col-sm-2">Nacionalidad</dt>
+        <dd class="col-sm-10">@Model.Nacionalidad</dd>
+    </dl>
+
+    <form asp-action="Eliminar" method="post">
+        <input type="hidden" asp-for="IdHuesped" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+

@@ -1,0 +1,46 @@
+@model IEnumerable<biblioteca_hotel.Clases.Factura>
+
+@{
+    ViewData["Title"] = "Facturas";
+}
+
+<h2>Lista de Facturas</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Número Factura</th>
+            <th>Fecha Emisión</th>
+            <th>Cliente</th>
+            <th>Reserva</th>
+            <th>Monto Total</th>
+            <th>Estado</th>
+            <th>Método Pago</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.NumeroFactura</td>
+                <td>@item.FechaEmision.ToString("dd/MM/yyyy")</td>
+                <td>@item.Cliente?.Nombre @item.Cliente?.Apellido</td>
+                <td>#@item.Reserva?.Id</td>
+                <td>@item.MontoTotal.ToString("C")</td>
+                <td>
+                    <span class="badge @(item.Estado == "Pagada" ? "bg-success" : "bg-warning")">
+                        @item.Estado
+                    </span>
+                </td>
+                <td>@item.MetodoPago</td>
+                <td>
+                    <a asp-action="VerFactura" asp-route-id="@item.Id" class="btn btn-info btn-sm">Ver Detalles</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Volver a Recepción</a>
+

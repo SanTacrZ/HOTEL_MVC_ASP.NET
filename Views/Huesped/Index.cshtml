@@ -1,0 +1,51 @@
+@model IEnumerable<biblioteca_hotel.Clases.Huesped>
+
+@{
+    ViewData["Title"] = "Huéspedes";
+}
+
+<h2>Lista de Huéspedes</h2>
+
+<p>
+    <a asp-action="Crear" class="btn btn-primary">Registrar Nuevo Huésped</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Tipo Documento</th>
+            <th>Número Documento</th>
+            <th>Nacionalidad</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdHuesped</td>
+                <td>@item.Nombre</td>
+                <td>@item.Apellido</td>
+                <td>@item.TipoDocumento?.Nombre</td>
+                <td>@item.NumeroDocumento</td>
+                <td>@item.Nacionalidad</td>
+                <td>@item.Telefono</td>
+                <td>
+                    <a asp-action="Detalles" asp-route-id="@item.IdHuesped" class="btn btn-info btn-sm">Detalles</a>
+                    <a asp-action="Editar" asp-route-id="@item.IdHuesped" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Eliminar" asp-route-id="@item.IdHuesped" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+

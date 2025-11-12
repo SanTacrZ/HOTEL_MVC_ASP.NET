@@ -1,0 +1,47 @@
+@model biblioteca_hotel.Clases.Huesped
+
+@{
+    ViewData["Title"] = "Editar Huésped";
+}
+
+<h2>Editar Huésped</h2>
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="IdHuesped" />
+    <div class="form-group">
+        <label asp-for="TipoDocumento.Nombre">Tipo Documento</label>
+        <input asp-for="TipoDocumento.Nombre" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="NumeroDocumento">Número de Documento</label>
+        <input asp-for="NumeroDocumento" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Nombre">Nombre</label>
+        <input asp-for="Nombre" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Apellido">Apellido</label>
+        <input asp-for="Apellido" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Nacionalidad">Nacionalidad</label>
+        <input asp-for="Nacionalidad" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Telefono">Teléfono</label>
+        <input asp-for="Telefono" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+

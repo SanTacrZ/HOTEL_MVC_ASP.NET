@@ -1,0 +1,35 @@
+@model biblioteca_hotel.Clases.Habitacion
+
+@{
+    ViewData["Title"] = "Detalles de Habitación";
+}
+
+<h2>Detalles de Habitación</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+        <dt class="col-sm-2">Número</dt>
+        <dd class="col-sm-10">@Model.Numero</dd>
+        <dt class="col-sm-2">Tipo</dt>
+        <dd class="col-sm-10">@Model.Tipo</dd>
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">
+            <span class="badge @(Model.Estado == "Disponible" ? "bg-success" : Model.Estado == "Ocupada" ? "bg-danger" : "bg-warning")">
+                @Model.Estado
+            </span>
+        </dd>
+        <dt class="col-sm-2">Precio por Noche</dt>
+        <dd class="col-sm-10">@Model.PrecioPorNoche.ToString("C")</dd>
+        <dt class="col-sm-2">Capacidad</dt>
+        <dd class="col-sm-10">@Model.Capacidad</dd>
+        <dt class="col-sm-2">Descripción</dt>
+        <dd class="col-sm-10">@Model.Descripcion</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a>
+</div>
+

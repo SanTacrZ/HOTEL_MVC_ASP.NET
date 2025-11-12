@@ -1,0 +1,74 @@
+@model IEnumerable<biblioteca_hotel.Clases.Habitacion>
+
+@{
+    ViewData["Title"] = "Habitaciones";
+}
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2>Lista de Habitaciones</h2>
+            <p class="mb-0">Gestión de todas las habitaciones del hotel</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a asp-action="Disponibles" class="btn btn-success">Ver Disponibles</a>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a asp-action="PorTipo" asp-route-tipo="Sencilla" class="btn btn-info">Sencillas</a>
+    <a asp-action="PorTipo" asp-route-tipo="Ejecutiva" class="btn btn-info">Ejecutivas</a>
+    <a asp-action="PorTipo" asp-route-tipo="Suite" class="btn btn-info">Suites</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Número</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Precio por Noche</th>
+                        <th>Capacidad</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td><strong>@item.Numero</strong></td>
+                                <td><span class="habitacion-tipo @item.Tipo.ToLower()">@item.Tipo</span></td>
+                                <td>
+                                    <span class="badge @(item.Estado == "Disponible" ? "bg-success" : item.Estado == "Ocupada" ? "bg-danger" : "bg-warning")">
+                                        @item.Estado
+                                    </span>
+                                </td>
+                                <td>@item.PrecioPorNoche.ToString("C")</td>
+                                <td>@item.Capacidad personas</td>
+                                <td class="text-center">
+                                    <a asp-action="Detalles" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No hay habitaciones registradas.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

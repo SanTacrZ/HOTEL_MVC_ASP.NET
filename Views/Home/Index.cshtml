@@ -1,0 +1,61 @@
+﻿@model biblioteca_hotel.Clases.Hotel
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido a @(Model?.Nombre ?? "Hotel Premium")</h1>
+    <p class="lead">Sistema de Gestión Hotelera</p>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Clientes</h5>
+                <p class="card-text">Gestionar clientes del hotel</p>
+                <a asp-controller="Cliente" asp-action="Index" class="btn btn-primary">Ir a Clientes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Huéspedes</h5>
+                <p class="card-text">Gestionar huéspedes</p>
+                <a asp-controller="Huesped" asp-action="Index" class="btn btn-primary">Ir a Huéspedes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Habitaciones</h5>
+                <p class="card-text">Ver disponibilidad de habitaciones</p>
+                <a asp-controller="Habitacion" asp-action="Index" class="btn btn-primary">Ir a Habitaciones</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Reservas</h5>
+                <p class="card-text">Gestionar reservas</p>
+                <a asp-controller="Reserva" asp-action="Index" class="btn btn-primary">Ir a Reservas</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Recepción</h5>
+                <p class="card-text">Check-in y Check-out</p>
+                <a asp-controller="Recepcion" asp-action="Index" class="btn btn-primary">Ir a Recepción</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+@model biblioteca_hotel.Clases.Huesped
+
+@{
+    ViewData["Title"] = "Detalles del Huésped";
+}
+
+<h2>Detalles del Huésped</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID Huésped</dt>
+        <dd class="col-sm-10">@Model.IdHuesped</dd>
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Nombre</dd>
+        <dt class="col-sm-2">Apellido</dt>
+        <dd class="col-sm-10">@Model.Apellido</dd>
+        <dt class="col-sm-2">Tipo Documento</dt>
+        <dd class="col-sm-10">@Model.TipoDocumento?.Nombre</dd>
+        <dt class="col-sm-2">Número Documento</dt>
+        <dd class="col-sm-10">@Model.NumeroDocumento</dd>
+        <dt class="col-sm-2">Nacionalidad</dt>
+        <dd class="col-sm-10">@Model.Nacionalidad</dd>
+        <dt class="col-sm-2">Teléfono</dt>
+        <dd class="col-sm-10">@Model.Telefono</dd>
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+        <dt class="col-sm-2">Fecha Registro</dt>
+        <dd class="col-sm-10">@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Editar" asp-route-id="@Model.IdHuesped" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a>
+</div>
+

@@ -1,0 +1,57 @@
+@model IEnumerable<biblioteca_hotel.Clases.Reserva>
+
+@{
+    ViewData["Title"] = "Recepción";
+}
+
+<h2>Gestión de Recepción</h2>
+
+<div class="mb-3">
+    <a asp-action="Facturas" class="btn btn-info">Ver Facturas</a>
+</div>
+
+<h3>Reservas</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha Entrada</th>
+            <th>Fecha Salida</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Cliente?.Nombre @item.Cliente?.Apellido</td>
+                <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <span class="badge @(item.Estado?.Nombre == "Confirmada" ? "bg-success" : item.Estado?.Nombre == "Cancelada" ? "bg-danger" : "bg-warning")">
+                        @item.Estado?.Nombre
+                    </span>
+                </td>
+                <td>
+                    @if (item.Estado?.Nombre == "Confirmada")
+                    {
+                        <a asp-action="CheckIn" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Check-In</a>
+                    }
+                    @if (item.Estado?.Nombre == "Check-In Realizado")
+                    {
+                        <a asp-action="CheckOut" asp-route-id="@item.Id" class="btn btn-success btn-sm">Check-Out</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+

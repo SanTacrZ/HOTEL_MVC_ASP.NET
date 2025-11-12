@@ -1,0 +1,150 @@
+@{
+    ViewData["Title"] = "Nueva Reserva";
+}
+
+<div class="page-header">
+    <h2>Crear Nueva Reserva</h2>
+    <p class="mb-0">Complete la información para realizar una nueva reserva</p>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+<div class="form-section">
+    <form asp-action="Crear" method="post" id="reservaForm">
+        <h4>Información de la Reserva</h4>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="clienteId" class="form-label">Cliente <span class="text-danger">*</span></label>
+                <select name="clienteId" class="form-control" required>
+                    <option value="">Seleccione un cliente...</option>
+                    @foreach (var cliente in ViewBag.Clientes)
+                    {
+                        <option value="@cliente.IdCliente">@cliente.Nombre @cliente.Apellido - @cliente.NumeroDocumento</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="fechaEntrada" class="form-label">Fecha de Entrada <span class="text-danger">*</span></label>
+                <input type="date" name="fechaEntrada" class="form-control" id="fechaEntrada" 
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="fechaSalida" class="form-label">Fecha de Salida <span class="text-danger">*</span></label>
+                <input type="date" name="fechaSalida" class="form-control" id="fechaSalida" required />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="numHuespedes" class="form-label">Número de Huéspedes <span class="text-danger">*</span></label>
+                <input type="number" name="numHuespedes" class="form-control" min="1" required />
+            </div>
+        </div>
+
+        <h4 class="mt-4">Habitaciones Disponibles</h4>
+        <div class="row" id="habitacionesContainer">
+            @foreach (var habitacion in ViewBag.Habitaciones)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="habitacion-card" onclick="toggleHabitacion(@habitacion.Id)">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="habitacionIds" 
+                                   value="@habitacion.Id" id="hab_@habitacion.Id" />
+                            <label class="form-check-label w-100" for="hab_@habitacion.Id">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="habitacion-tipo @habitacion.Tipo.ToLower()">@habitacion.Tipo</span>
+                                        <h5 class="mt-2 mb-1">Habitación @habitacion.Numero</h5>
+                                        <p class="text-muted mb-2">@habitacion.Descripcion</p>
+                                        <div class="habitacion-precio">@habitacion.PrecioPorNoche.ToString("C")</div>
+                                        <small class="text-muted">por noche</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (ViewBag.Habitaciones != null && ((List<dynamic>)ViewBag.Habitaciones).Count == 0)
+        {
+            <div class="alert alert-warning">
+                No hay habitaciones disponibles en este momento.
+            </div>
+        }
+
+        <h4 class="mt-4">Huéspedes (Opcional)</h4>
+        <div class="mb-3">
+            <label for="huespedIds" class="form-label">Seleccionar Huéspedes</label>
+            <select name="huespedIds" class="form-control" multiple size="5">
+                @foreach (var huesped in ViewBag.Huespedes)
+                {
+                    <option value="@huesped.IdHuesped">@huesped.Nombre @huesped.Apellido - @huesped.NumeroDocumento (@huesped.Nacionalidad)</option>
+                }
+            </select>
+            <small class="form-text text-muted">Mantenga presionado Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Crear Reserva</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleHabitacion(id) {
+            const checkbox = document.getElementById('hab_' + id);
+            const card = checkbox.closest('.habitacion-card');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        }
+
+        document.getElementById('fechaEntrada').addEventListener('change', function() {
+            const fechaEntrada = new Date(this.value);
+            const fechaSalida = document.getElementById('fechaSalida');
+            fechaSalida.min = this.value;
+            
+            if (fechaSalida.value && new Date(fechaSalida.value) <= fechaEntrada) {
+                fechaSalida.value = '';
+            }
+        });
+
+        document.getElementById('reservaForm').addEventListener('submit', function(e) {
+            const habitaciones = document.querySelectorAll('input[name="habitacionIds"]:checked');
+            const fechaEntrada = new Date(document.getElementById('fechaEntrada').value);
+            const fechaSalida = new Date(document.getElementById('fechaSalida').value);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            if (habitaciones.length === 0) {
+                e.preventDefault();
+                alert('Debe seleccionar al menos una habitación');
+                return false;
+            }
+
+            if (fechaEntrada < hoy) {
+                e.preventDefault();
+                alert('La fecha de entrada no puede ser anterior a hoy');
+                return false;
+            }
+
+            if (fechaEntrada >= fechaSalida) {
+                e.preventDefault();
+                alert('La fecha de entrada debe ser anterior a la fecha de salida');
+                return false;
+            }
+        });
+    </script>
+}

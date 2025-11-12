@@ -1,0 +1,64 @@
+@model IEnumerable<biblioteca_hotel.Clases.Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h2>Lista de Reservas</h2>
+
+<p>
+    <a asp-action="Crear" class="btn btn-primary">Nueva Reserva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha Entrada</th>
+            <th>Fecha Salida</th>
+            <th>Número Huéspedes</th>
+            <th>Estado</th>
+            <th>Precio Total</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Cliente?.Nombre @item.Cliente?.Apellido</td>
+                <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
+                <td>@item.NumHuespedes</td>
+                <td>
+                    <span class="badge @(item.Estado?.Nombre == "Confirmada" ? "bg-success" : item.Estado?.Nombre == "Cancelada" ? "bg-danger" : "bg-warning")">
+                        @item.Estado?.Nombre
+                    </span>
+                </td>
+                <td>@item.PrecioTotal.ToString("C")</td>
+                <td>
+                    <a asp-action="Detalles" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                    @if (item.Estado?.Nombre == "Pendiente")
+                    {
+                        <form asp-action="Confirmar" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Confirmar</button>
+                        </form>
+                        <form asp-action="Cancelar" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+

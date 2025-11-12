@@ -1,0 +1,77 @@
+@model IEnumerable<biblioteca_hotel.Clases.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>Lista de Clientes</h2>
+            <p class="mb-0">Gestión de clientes del hotel</p>
+        </div>
+        <a asp-action="Crear" class="btn btn-primary btn-lg">+ Registrar Nuevo Cliente</a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre Completo</th>
+                        <th>Tipo Documento</th>
+                        <th>Número Documento</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Tipo Cliente</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.IdCliente</td>
+                                <td><strong>@item.Nombre @item.Apellido</strong></td>
+                                <td><span class="badge bg-secondary">@item.TipoDocumento?.Nombre</span></td>
+                                <td>@item.NumeroDocumento</td>
+                                <td>@item.Telefono</td>
+                                <td>@item.Email</td>
+                                <td><span class="badge bg-info">@item.TipoCliente</span></td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Detalles" asp-route-id="@item.IdCliente" class="btn btn-info btn-sm">Detalles</a>
+                                        <a asp-action="Editar" asp-route-id="@item.IdCliente" class="btn btn-warning btn-sm">Editar</a>
+                                        <a asp-action="Eliminar" asp-route-id="@item.IdCliente" class="btn btn-danger btn-sm">Eliminar</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No hay clientes registrados. <a asp-action="Crear">Registrar el primero</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
