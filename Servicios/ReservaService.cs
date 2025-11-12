@@ -9,12 +9,14 @@ namespace hotel_web_final.Servicios
         private readonly HabitacionService _habitacionService;
         private readonly ClienteService _clienteService;
         private readonly HuespedService _huespedService;
+        private readonly AuditoriaService _auditoriaService;
 
-        public ReservaService(HabitacionService habitacionService, ClienteService clienteService, HuespedService huespedService)
+        public ReservaService(HabitacionService habitacionService, ClienteService clienteService, HuespedService huespedService, AuditoriaService auditoriaService)
         {
             _habitacionService = habitacionService;
             _clienteService = clienteService;
             _huespedService = huespedService;
+            _auditoriaService = auditoriaService;
         }
 
         public Reserva CrearReserva(int clienteId, DateTime fechaEntrada, DateTime fechaSalida, int numHuespedes, List<int> habitacionIds, List<int>? huespedIds = null)
@@ -70,6 +72,15 @@ namespace hotel_web_final.Servicios
 
             reserva.CalcularPrecioTotal();
             _reservas.Add(reserva);
+
+            // Registrar en auditoría
+            _auditoriaService.RegistrarCreacionReserva(
+                reserva.Id,
+                $"{cliente.Nombre} {cliente.Apellido}",
+                fechaEntrada,
+                fechaSalida
+            );
+
             return reserva;
         }
 
@@ -100,6 +111,9 @@ namespace hotel_web_final.Servicios
                 throw new Exception($"Reserva con ID {id} no encontrada");
 
             reserva.ConfirmarReserva();
+
+            // Registrar en auditoría
+            _auditoriaService.RegistrarConfirmacionReserva(id);
         }
 
         public void CancelarReserva(int id)
@@ -113,6 +127,9 @@ namespace hotel_web_final.Servicios
             {
                 habitacion.Liberar();
             }
+
+            // Registrar en auditoría
+            _auditoriaService.RegistrarCancelacionReserva(id);
         }
 
         public void ActualizarReserva(Reserva reserva)

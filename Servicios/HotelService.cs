@@ -20,10 +20,10 @@ namespace hotel_web_final.Servicios
             _hotel = new Hotel
             {
                 Id = 1,
-                Nombre = "Hotel Premium",
+                Nombre = "Hotel Santa",
                 Direccion = "Calle Principal 123",
                 Telefono = "+57 300 123 4567",
-                Email = "contacto@hotelpremium.com",
+                Email = "contacto@hotelsanta.com",
                 Estrellas = 5
             };
 
@@ -33,7 +33,7 @@ namespace hotel_web_final.Servicios
                 Nombre = "Oficina de Reservas",
                 Direccion = _hotel.Direccion,
                 Telefono = _hotel.Telefono,
-                Email = "reservas@hotelpremium.com",
+                Email = "reservas@hotelsanta.com",
                 Hotel = _hotel
             };
 

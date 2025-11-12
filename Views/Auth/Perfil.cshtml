@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Perfil de Usuario";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Perfil de Usuario
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Mensaje"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            <i class="bi bi-person-badge" style="font-size: 5rem; color: #667eea;"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h4>Información del Usuario</h4>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="150">Usuario:</th>
+                                    <td><strong>@ViewBag.Usuario</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Estado:</th>
+                                    <td>
+                                        @if (ViewBag.EstaAutenticado)
+                                        {
+                                            <span class="badge bg-success">Autenticado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">No autenticado</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Sesión activa:</th>
+                                    <td>Sí</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h5 class="mb-3">Acciones</h5>
+                            <div class="d-grid gap-2">
+                                <a asp-action="CambiarContrasena" class="btn btn-outline-primary">
+                                    <i class="bi bi-key"></i> Cambiar Contraseña
+                                </a>
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

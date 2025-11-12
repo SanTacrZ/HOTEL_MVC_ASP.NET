@@ -1,43 +1,347 @@
+@using biblioteca_hotel.Clases
+@using biblioteca_hotel.Interfaces
 @model biblioteca_hotel.Clases.Factura
 
 @{
     ViewData["Title"] = "Factura";
+    var reserva = Model.Reserva;
+    int noches = reserva != null ? (reserva.FechaSalida - reserva.FechaEntrada).Days : 0;
+    decimal subtotalHabitaciones = 0;
+    decimal costoMinibar = 0;
+    decimal seguro = 0;
+    decimal iva = 0;
+
+    if (reserva != null)
+    {
+        foreach (var habitacion in reserva.Habitaciones)
+        {
+            subtotalHabitaciones += habitacion.PrecioPorNoche * noches;
+
+            if (habitacion is IMinibar habitacionConMinibar)
+            {
+                costoMinibar += habitacionConMinibar.CalcularCostoConsumo();
+            }
+        }
+
+        seguro = subtotalHabitaciones * 0.025m;
+        var esColombiano = reserva.Huespedes.Any(h => h.Nacionalidad?.ToLower() == "colombia" ||
+                                                      h.Nacionalidad?.ToLower() == "colombiano");
+        if (esColombiano)
+        {
+            iva = subtotalHabitaciones * 0.19m;
+        }
+    }
 }
 
-<h2>Factura #@Model.NumeroFactura</h2>
+<div class="container-fluid">
+    <!-- Encabezado de Factura -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h3 class="mb-0">
+                                <i class="bi bi-receipt"></i> Factura #@Model.NumeroFactura
+                            </h3>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge @(Model.Estado == "Pagada" ? "bg-success" : "bg-warning") fs-5">
+                                @Model.Estado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Información del Cliente</h5>
+                            <p class="mb-1"><strong>Nombre:</strong> @Model.Cliente?.Nombre @Model.Cliente?.Apellido</p>
+                            <p class="mb-1"><strong>Documento:</strong> @Model.Cliente?.TipoDocumento?.Nombre @Model.Cliente?.NumeroDocumento</p>
+                            <p class="mb-1"><strong>Teléfono:</strong> @Model.Cliente?.Telefono</p>
+                            @if (!string.IsNullOrEmpty(Model.Cliente?.Email))
+                            {
+                                <p class="mb-1"><strong>Email:</strong> @Model.Cliente?.Email</p>
+                            }
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h5>Detalles de la Factura</h5>
+                            <p class="mb-1"><strong>Fecha de Emisión:</strong> @Model.FechaEmision.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p class="mb-1"><strong>Reserva:</strong> #@Model.Reserva?.Id</p>
+                            <p class="mb-1"><strong>Método de Pago:</strong> @Model.MetodoPago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="card">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Número de Factura</dt>
-            <dd class="col-sm-9">@Model.NumeroFactura</dd>
-            <dt class="col-sm-3">Fecha de Emisión</dt>
-            <dd class="col-sm-9">@Model.FechaEmision.ToString("dd/MM/yyyy HH:mm")</dd>
-            <dt class="col-sm-3">Cliente</dt>
-            <dd class="col-sm-9">@Model.Cliente?.Nombre @Model.Cliente?.Apellido</dd>
-            <dt class="col-sm-3">Reserva</dt>
-            <dd class="col-sm-9">#@Model.Reserva?.Id</dd>
-            <dt class="col-sm-3">Monto Total</dt>
-            <dd class="col-sm-9"><strong>@Model.MontoTotal.ToString("C")</strong></dd>
-            <dt class="col-sm-3">Estado</dt>
-            <dd class="col-sm-9">
-                <span class="badge @(Model.Estado == "Pagada" ? "bg-success" : "bg-warning")">
-                    @Model.Estado
-                </span>
-            </dd>
-            <dt class="col-sm-3">Método de Pago</dt>
-            <dd class="col-sm-9">@Model.MetodoPago</dd>
-            @if (!string.IsNullOrEmpty(Model.Observaciones))
+    @if (reserva != null)
+    {
+        <!-- Detalles de Estadía -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Detalles de Estadía</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <strong>Fecha de Entrada</strong>
+                                <p class="mb-0 text-primary fs-5">@reserva.FechaEntrada.ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Fecha de Salida</strong>
+                                <p class="mb-0 text-danger fs-5">@reserva.FechaSalida.ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Total de Noches</strong>
+                                <p class="mb-0 text-success fs-5">@noches noche@(noches != 1 ? "s" : "")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habitaciones -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-door-open"></i> Habitaciones</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Habitación</th>
+                                    <th>Tipo</th>
+                                    <th class="text-end">Precio/Noche</th>
+                                    <th class="text-center">Noches</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var habitacion in reserva.Habitaciones)
+                                {
+                                    decimal costoHabitacion = habitacion.PrecioPorNoche * noches;
+                                    <tr>
+                                        <td><strong>@habitacion.Numero</strong></td>
+                                        <td>
+                                            <span class="badge bg-info">@habitacion.Tipo</span>
+                                        </td>
+                                        <td class="text-end">@habitacion.PrecioPorNoche.ToString("C")</td>
+                                        <td class="text-center">@noches</td>
+                                        <td class="text-end"><strong>@costoHabitacion.ToString("C")</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>Subtotal Habitaciones:</strong></td>
+                                    <td class="text-end"><strong>@subtotalHabitaciones.ToString("C")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consumos de Minibar -->
+        var habitacionesConConsumos = reserva.Habitaciones.Where(h =>
+            h is IMinibar && h.Minibar?.ConsumosRealizados != null && h.Minibar.ConsumosRealizados.Any()).ToList();
+
+        if (habitacionesConConsumos.Any())
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="bi bi-cup-straw"></i> Consumos de Minibar</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            @foreach (var habitacion in habitacionesConConsumos)
+                            {
+                                <div class="p-3 border-bottom">
+                                    <h6 class="text-primary mb-3">Habitación @habitacion.Numero</h6>
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th class="text-center">Cantidad</th>
+                                                <th class="text-end">Precio Unit.</th>
+                                                <th class="text-end">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var consumo in habitacion.Minibar.ConsumosRealizados)
+                                            {
+                                                <tr>
+                                                    <td>@consumo.ProductoConsumido?.Nombre</td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-secondary">@consumo.Cantidad</span>
+                                                    </td>
+                                                    <td class="text-end">@consumo.PrecioAlConsumir.ToString("C")</td>
+                                                    <td class="text-end"><strong>@consumo.CalcularSubtotal().ToString("C")</strong></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            <div class="p-3 bg-light">
+                                <div class="row">
+                                    <div class="col text-end">
+                                        <strong>Subtotal Minibar:</strong> <span class="text-primary fs-5">@costoMinibar.ToString("C")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> No se registraron consumos de minibar durante la estadía.
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <!-- Resumen de Totales -->
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-4 col-lg-6 offset-lg-6">
+            <div class="card border-success">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Resumen de Totales</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <td>Subtotal Habitaciones:</td>
+                                <td class="text-end">@subtotalHabitaciones.ToString("C")</td>
+                            </tr>
+                            @if (costoMinibar > 0)
+                            {
+                                <tr>
+                                    <td>Consumos Minibar:</td>
+                                    <td class="text-end">@costoMinibar.ToString("C")</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td>Seguro Hotelero (2.5%):</td>
+                                <td class="text-end">@seguro.ToString("C")</td>
+                            </tr>
+                            @if (iva > 0)
+                            {
+                                <tr>
+                                    <td>IVA (19%):</td>
+                                    <td class="text-end">@iva.ToString("C")</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>IVA (19%):</td>
+                                    <td class="text-end"><em class="text-muted">No aplica</em></td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-success">
+                            <tr class="fw-bold fs-5">
+                                <td>TOTAL A PAGAR:</td>
+                                <td class="text-end">@Model.MontoTotal.ToString("C")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de alerta -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Botones de Acción -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <a asp-action="Facturas" class="btn btn-secondary btn-lg">
+                <i class="bi bi-arrow-left"></i> Volver a Facturas
+            </a>
+            <a asp-action="Index" class="btn btn-primary btn-lg">
+                <i class="bi bi-house"></i> Volver a Recepción
+            </a>
+            <button onclick="window.print()" class="btn btn-success btn-lg">
+                <i class="bi bi-printer"></i> Imprimir Factura
+            </button>
+
+            @if (!string.IsNullOrEmpty(Model.Cliente?.Email))
             {
-                <dt class="col-sm-3">Observaciones</dt>
-                <dd class="col-sm-9">@Model.Observaciones</dd>
+                <form asp-action="EnviarFacturaPorCorreo" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-info btn-lg" onclick="return confirm('¿Desea enviar la factura a @Model.Cliente.Email?')">
+                        <i class="bi bi-envelope"></i> Enviar por Correo
+                    </button>
+                </form>
             }
-        </dl>
+            else
+            {
+                <button type="button" class="btn btn-secondary btn-lg" disabled title="El cliente no tiene email registrado">
+                    <i class="bi bi-envelope-slash"></i> Sin Email
+                </button>
+            }
+        </div>
     </div>
 </div>
 
-<div class="mt-3">
-    <a asp-action="Facturas" class="btn btn-secondary">Volver a Facturas</a>
-    <a asp-action="Index" class="btn btn-primary">Volver a Recepción</a>
-</div>
+<style>
+    @@media print {
+        .btn, .alert {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #000 !important;
+            page-break-inside: avoid;
+        }
+    }
+
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
 

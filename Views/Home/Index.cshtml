@@ -5,7 +5,7 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Bienvenido a @(Model?.Nombre ?? "Hotel Premium")</h1>
+    <h1 class="display-4">Bienvenido a @(Model?.Nombre ?? "Hotel Santa")</h1>
     <p class="lead">Sistema de Gestión Hotelera</p>
 </div>
 
@@ -55,6 +55,54 @@
                 <h5 class="card-title">Recepción</h5>
                 <p class="card-text">Check-in y Check-out</p>
                 <a asp-controller="Recepcion" asp-action="Index" class="btn btn-primary">Ir a Recepción</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-shield-check text-success"></i> Auditoría
+                </h5>
+                <p class="card-text">Ver registros del sistema</p>
+                <a asp-controller="Auditoria" asp-action="Index" class="btn btn-success">Ver Auditoría</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-shield-lock text-primary"></i> Sistema de Autenticación
+                </h5>
+                @{
+                    var usuario = Context.Session.GetString("Usuario");
+                }
+                @if (string.IsNullOrEmpty(usuario))
+                {
+                    <p class="card-text">Inicia sesión para acceder a funciones administrativas</p>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </a>
+                    <small class="text-muted d-block mt-2">
+                        Usuarios disponibles: admin/admin123 | recepcion/recepcion123 | gerente/gerente123
+                    </small>
+                }
+                else
+                {
+                    <p class="card-text">Bienvenido, <strong>@usuario</strong></p>
+                    <a asp-controller="Auth" asp-action="Perfil" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-person"></i> Mi Perfil
+                    </a>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                }
             </div>
         </div>
     </div>

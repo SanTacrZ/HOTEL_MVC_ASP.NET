@@ -9,17 +9,40 @@ namespace hotel_web_final
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                // Agregar filtro de autorización global
+                options.Filters.Add<hotel_web_final.Filters.AuthorizationFilter>();
+            });
             builder.Services.AddHttpContextAccessor();
+
+            // Configurar sesiones para el sistema de autenticación
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             // --- CORRECCIÓN 1: Todos los servicios deben ser Singleton ---
             // Así actúan como una base de datos en memoria.
+
+            // Servicios base (sin dependencias)
+            builder.Services.AddSingleton<AuditoriaService>();      // Sin dependencias
+            builder.Services.AddSingleton<AuthService>();           // Depende de AuditoriaService
+            builder.Services.AddSingleton<NotificacionService>();   // Depende de AuditoriaService
+            builder.Services.AddSingleton<HabitacionService>();     // Sin dependencias
+            builder.Services.AddSingleton<HotelService>();          // Sin dependencias
+
+            // Servicios con dependencias de AuditoriaService
             builder.Services.AddSingleton<ClienteService>();
             builder.Services.AddSingleton<HuespedService>();
-            builder.Services.AddSingleton<HabitacionService>();
-            builder.Services.AddSingleton<HotelService>();
-            builder.Services.AddSingleton<ReservaService>();    // <-- CORREGIDO
-            builder.Services.AddSingleton<RecepcionService>();  // <-- CORREGIDO
+            builder.Services.AddSingleton<MinibarService>();
+
+            // Servicios que dependen de otros servicios
+            builder.Services.AddSingleton<ReservaService>();        // Depende de Habitacion, Cliente, Huesped, Auditoria
+            builder.Services.AddSingleton<RecepcionService>();      // Depende de Reserva, Hotel, Auditoria
 
             var app = builder.Build();
 
@@ -32,6 +55,7 @@ namespace hotel_web_final
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseSession();
             app.UseAuthorization();
 
             // --- Carga de datos inicial al arrancar la app ---
@@ -91,7 +115,7 @@ namespace hotel_web_final
             
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Auth}/{action=Login}/{id?}");
 
             app.Run();
         }

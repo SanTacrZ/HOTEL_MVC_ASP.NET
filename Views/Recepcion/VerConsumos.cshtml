@@ -1,0 +1,92 @@
+@model List<biblioteca_hotel.Clases.Consumo>
+
+@{
+    ViewData["Title"] = "Consumos del Minibar";
+}
+
+<h2>Consumos Registrados - Habitación #@ViewBag.HabitacionId</h2>
+
+<div class="row mb-3">
+    <div class="col">
+        <a asp-action="GestionarMinibar" asp-route-habitacionId="@ViewBag.HabitacionId" class="btn btn-primary">Volver al Minibar</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver a Recepción</a>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <h4>Costo Total: @ViewBag.CostoTotal.ToString("C")</h4>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card">
+        <div class="card-header">
+            <h4>Detalle de Consumos</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var consumo in Model.OrderByDescending(c => c.FechaConsumo))
+                    {
+                        <tr>
+                            <td>@consumo.FechaConsumo.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <strong>@consumo.ProductoConsumido?.Nombre</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">@consumo.Cantidad</span>
+                            </td>
+                            <td>@consumo.PrecioAlConsumir.ToString("C")</td>
+                            <td>
+                                <strong>@consumo.CalcularSubtotal().ToString("C")</strong>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-success">
+                        <td colspan="4" class="text-end"><strong>TOTAL:</strong></td>
+                        <td><strong>@ViewBag.CostoTotal.ToString("C")</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-3">
+        <strong>Nota:</strong> Este costo se sumará automáticamente al total de la factura durante el check-out.
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        <h4>No hay consumos registrados</h4>
+        <p>No se han registrado consumos del minibar para esta habitación.</p>
+        <a asp-action="GestionarMinibar" asp-route-habitacionId="@ViewBag.HabitacionId" class="btn btn-primary">
+            Registrar Consumos
+        </a>
+    </div>
+}
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: default;
+    }
+</style>

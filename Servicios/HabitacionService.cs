@@ -54,6 +54,7 @@ namespace hotel_web_final.Servicios
                     NumeroCamas = i % 2 == 0 ? 1 : 2,
                     Descripcion = "Habitación ejecutiva con minibar"
                 };
+                InicializarMinibar(ejecutiva);
                 Agregar(ejecutiva);
             }
 
@@ -68,6 +69,7 @@ namespace hotel_web_final.Servicios
                     NumeroCamas = i % 2 == 0 ? 1 : 2,
                     Descripcion = "Suite de lujo con minibar completo"
                 };
+                InicializarMinibar(suite);
                 Agregar(suite);
             }
         }
@@ -105,6 +107,49 @@ namespace hotel_web_final.Servicios
 
             var index = _habitaciones.IndexOf(existente);
             _habitaciones[index] = habitacion;
+        }
+
+        /// <summary>
+        /// Inicializa el minibar de una habitación con productos estándar.
+        /// </summary>
+        /// <param name="habitacion">La habitación a la que se le inicializará el minibar</param>
+        private void InicializarMinibar(Habitacion habitacion)
+        {
+            if (habitacion?.Minibar == null)
+                return;
+
+            // Productos básicos para todos los minibares
+            var productos = new List<Producto>
+            {
+                new Agua { Id = 1, Nombre = "Agua Mineral", Precio = 3000, Stock = 4 },
+                new Agua { Id = 2, Nombre = "Agua con Gas", Precio = 3500, Stock = 2 },
+                new Gaseosa { Id = 3, Nombre = "Coca Cola", Precio = 4000, Stock = 3 },
+                new Gaseosa { Id = 4, Nombre = "Sprite", Precio = 4000, Stock = 3 },
+                new Jugo { Id = 5, Nombre = "Jugo de Naranja", Precio = 5000, Stock = 2 },
+                new Jugo { Id = 6, Nombre = "Jugo de Manzana", Precio = 5000, Stock = 2 },
+                new Snack { Id = 7, Nombre = "Papas Fritas", Precio = 6000, Stock = 3 },
+                new Snack { Id = 8, Nombre = "Maní", Precio = 5000, Stock = 3 },
+                new Snack { Id = 9, Nombre = "Chocolate", Precio = 7000, Stock = 2 }
+            };
+
+            // Si es una Suite, agregar productos premium
+            if (habitacion is Suite)
+            {
+                productos.AddRange(new List<Producto>
+                {
+                    new Vino { Id = 10, Nombre = "Vino Tinto", Precio = 45000, Stock = 2 },
+                    new Vino { Id = 11, Nombre = "Vino Blanco", Precio = 45000, Stock = 2 },
+                    new Licor { Id = 12, Nombre = "Whisky", Precio = 80000, Stock = 1 },
+                    new Licor { Id = 13, Nombre = "Vodka", Precio = 70000, Stock = 1 },
+                    new Bebida { Id = 14, Nombre = "Champagne", Precio = 120000, Stock = 1 }
+                });
+            }
+
+            // Agregar los productos al minibar
+            foreach (var producto in productos)
+            {
+                habitacion.Minibar.AgregarProducto(producto);
+            }
         }
     }
 }

@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-key"></i> Cambiar Contraseña
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="CambiarContrasena" method="post">
+                        <div class="mb-3">
+                            <label for="contrasenaActual" class="form-label">Contraseña Actual</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password"
+                                       class="form-control"
+                                       id="contrasenaActual"
+                                       name="contrasenaActual"
+                                       placeholder="Ingrese su contraseña actual"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contrasenaNueva" class="form-label">Nueva Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password"
+                                       class="form-control"
+                                       id="contrasenaNueva"
+                                       name="contrasenaNueva"
+                                       placeholder="Ingrese la nueva contraseña"
+                                       minlength="6"
+                                       required>
+                            </div>
+                            <small class="form-text text-muted">
+                                La contraseña debe tener al menos 6 caracteres
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmarContrasena" class="form-label">Confirmar Nueva Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password"
+                                       class="form-control"
+                                       id="confirmarContrasena"
+                                       name="confirmarContrasena"
+                                       placeholder="Confirme la nueva contraseña"
+                                       minlength="6"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <small>
+                                Por seguridad, asegúrese de que su nueva contraseña sea diferente de la anterior
+                                y sea difícil de adivinar.
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Cambiar Contraseña
+                            </button>
+                            <a asp-action="Perfil" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validar que las contraseñas coincidan
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const nueva = document.getElementById('contrasenaNueva').value;
+        const confirmar = document.getElementById('confirmarContrasena').value;
+
+        if (nueva !== confirmar) {
+            e.preventDefault();
+            alert('La nueva contraseña y la confirmación no coinciden');
+            return false;
+        }
+    });
+</script>

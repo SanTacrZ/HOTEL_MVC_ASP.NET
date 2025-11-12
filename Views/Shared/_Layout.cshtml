@@ -3,25 +3,34 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hotel Premium</title>
+    <title>@ViewData["Title"] - Hotel Santa</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/hotel_web_final.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid">
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var isLoginPage = currentController == "Auth" && currentAction == "Login";
+    }
+
+    @if (!isLoginPage)
+    {
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    🏨 Hotel Premium
+                    🏨 Hotel Santa
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
@@ -40,11 +49,59 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Recepcion" asp-action="Index">Recepción</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Auditoria" asp-action="Index">
+                                <i class="bi bi-shield-check"></i> Auditoría
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @{
+                            var usuario = Context.Session.GetString("Usuario");
+                        }
+                        @if (!string.IsNullOrEmpty(usuario))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> @usuario
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Auth" asp-action="Perfil">
+                                            <i class="bi bi-person"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Auth" asp-action="CambiarContrasena">
+                                            <i class="bi bi-key"></i> Cambiar Contraseña
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-light" asp-controller="Auth" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
-    </header>
+        </header>
+    }
 
     <div class="main-content">
         <div class="container-fluid px-3 px-md-4">
@@ -54,20 +111,23 @@
         </div>
     </div>
 
-    
 
-    <footer class="footer py-3">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-md-6 text-center text-md-start">
-                    <span>&copy; 2025 Hotel Premium. Todos los derechos reservados.</span>
-                </div>
-                <div class="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-white text-decoration-none">Política de Privacidad</a>
+
+    @if (!isLoginPage)
+    {
+        <footer class="footer py-3">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-md-6 text-center text-md-start">
+                        <span>&copy; 2025 Hotel Santa. Todos los derechos reservados.</span>
+                    </div>
+                    <div class="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
+                        <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-white text-decoration-none">Política de Privacidad</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

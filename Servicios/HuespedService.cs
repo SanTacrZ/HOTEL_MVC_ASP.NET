@@ -7,6 +7,12 @@ namespace hotel_web_final.Servicios
     {
         private readonly List<Huesped> _huespedes = new();
         private int _nextId = 1;
+        private readonly AuditoriaService _auditoriaService;
+
+        public HuespedService(AuditoriaService auditoriaService)
+        {
+            _auditoriaService = auditoriaService;
+        }
 
         public void Agregar(Huesped huesped)
         {
@@ -21,6 +27,12 @@ namespace hotel_web_final.Servicios
             huesped.IdHuesped = _nextId++;
             huesped.RegistrarHuesped();
             _huespedes.Add(huesped);
+
+            // Registrar en auditoría
+            _auditoriaService.RegistrarNuevoHuesped(
+                $"{huesped.Nombre} {huesped.Apellido}",
+                huesped.Nacionalidad
+            );
         }
 
         private void ValidarHuesped(Huesped huesped)

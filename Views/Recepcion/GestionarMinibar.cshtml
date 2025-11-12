@@ -1,0 +1,104 @@
+@model biblioteca_hotel.Clases.Minibar
+
+@{
+    ViewData["Title"] = "Gestionar Minibar";
+}
+
+<h2>Gestionar Minibar - Habitación #@ViewBag.HabitacionId</h2>
+
+<div class="row mb-3">
+    <div class="col">
+        <a asp-action="Index" class="btn btn-secondary">Volver a Recepción</a>
+        <a asp-action="VerConsumos" asp-route-habitacionId="@ViewBag.HabitacionId" class="btn btn-info">Ver Consumos Registrados</a>
+    </div>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white">
+        <h4>Costo Total de Consumos: @ViewBag.CostoTotal.ToString("C")</h4>
+    </div>
+</div>
+
+<h3>Productos Disponibles en el Minibar</h3>
+
+<div class="row">
+    @if (Model?.ProductosDisponibles != null && Model.ProductosDisponibles.Any())
+    {
+        @foreach (var producto in Model.ProductosDisponibles)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card @(producto.Stock > 0 ? "" : "border-danger")">
+                    <div class="card-body">
+                        <h5 class="card-title">@producto.Nombre</h5>
+                        <p class="card-text">
+                            <strong>Precio:</strong> @producto.Precio.ToString("C")<br />
+                            <strong>Stock:</strong>
+                            <span class="badge @(producto.Stock > 3 ? "bg-success" : producto.Stock > 0 ? "bg-warning" : "bg-danger")">
+                                @producto.Stock unidades
+                            </span>
+                        </p>
+
+                        @if (producto.Stock > 0)
+                        {
+                            <form asp-action="RegistrarConsumo" method="post" class="d-inline">
+                                <input type="hidden" name="habitacionId" value="@ViewBag.HabitacionId" />
+                                <input type="hidden" name="productoId" value="@producto.Id" />
+                                <div class="input-group mb-2">
+                                    <input type="number" name="cantidad" class="form-control"
+                                           min="1" max="@producto.Stock" value="1" required />
+                                    <button type="submit" class="btn btn-primary">
+                                        Registrar Consumo
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary" disabled>Sin Stock</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No hay productos disponibles en el minibar.
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        height: 100%;
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .input-group input[type="number"] {
+        max-width: 80px;
+    }
+</style>

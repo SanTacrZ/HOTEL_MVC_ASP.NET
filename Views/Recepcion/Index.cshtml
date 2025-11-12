@@ -42,6 +42,14 @@
                     }
                     @if (item.Estado?.Nombre == "Check-In Realizado")
                     {
+                        @if (item.Habitaciones != null && item.Habitaciones.Any())
+                        {
+                            var primeraHabitacion = item.Habitaciones.First();
+                            <a asp-action="GestionarMinibar" asp-route-habitacionId="@primeraHabitacion.Id"
+                               class="btn btn-warning btn-sm" title="Gestionar Minibar">
+                                <i class="bi bi-cup-straw"></i> Minibar
+                            </a>
+                        }
                         <a asp-action="CheckOut" asp-route-id="@item.Id" class="btn btn-success btn-sm">Check-Out</a>
                     }
                 </td>

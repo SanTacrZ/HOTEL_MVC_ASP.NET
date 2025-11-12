@@ -124,10 +124,8 @@
 
         document.getElementById('reservaForm').addEventListener('submit', function(e) {
             const habitaciones = document.querySelectorAll('input[name="habitacionIds"]:checked');
-            const fechaEntrada = new Date(document.getElementById('fechaEntrada').value);
-            const fechaSalida = new Date(document.getElementById('fechaSalida').value);
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
+            const fechaEntradaInput = document.getElementById('fechaEntrada').value;
+            const fechaSalidaInput = document.getElementById('fechaSalida').value;
 
             if (habitaciones.length === 0) {
                 e.preventDefault();
@@ -135,15 +133,30 @@
                 return false;
             }
 
-            if (fechaEntrada < hoy) {
+            if (!fechaEntradaInput) {
+                e.preventDefault();
+                alert('Debe seleccionar una fecha de entrada');
+                return false;
+            }
+
+            if (!fechaSalidaInput) {
+                e.preventDefault();
+                alert('Debe seleccionar una fecha de salida');
+                return false;
+            }
+
+            // Comparar fechas como strings en formato YYYY-MM-DD
+            const hoy = new Date().toISOString().split('T')[0];
+
+            if (fechaEntradaInput < hoy) {
                 e.preventDefault();
                 alert('La fecha de entrada no puede ser anterior a hoy');
                 return false;
             }
 
-            if (fechaEntrada >= fechaSalida) {
+            if (fechaEntradaInput >= fechaSalidaInput) {
                 e.preventDefault();
-                alert('La fecha de entrada debe ser anterior a la fecha de salida');
+                alert('La fecha de salida debe ser posterior a la fecha de entrada');
                 return false;
             }
         });
