@@ -95,5 +95,16 @@ namespace hotel_web_final.Servicios
             var habitacion = _habitacionService.BuscarPorId(habitacionId);
             return habitacion is IMinibar && habitacion.Minibar != null;
         }
+
+        /// <summary>
+        /// Obtiene el costo total de los consumos de minibar de una habitación.
+        /// Este método es usado por el controlador AJAX para actualizar el total en tiempo real.
+        /// </summary>
+        /// <param name="habitacionId">ID de la habitación</param>
+        /// <returns>Costo total de los consumos del minibar</returns>
+        public decimal ObtenerCostoTotalConsumos(int habitacionId)
+        {
+            return CalcularCostoTotal(habitacionId);
+        }
     }
 }

@@ -50,6 +50,10 @@
                                 <i class="bi bi-cup-straw"></i> Minibar
                             </a>
                         }
+                        <a asp-action="GestionarServicios" asp-route-reservaId="@item.Id"
+                           class="btn btn-info btn-sm" title="Servicios Adicionales">
+                            <i class="bi bi-stars"></i> Servicios
+                        </a>
                         <a asp-action="CheckOut" asp-route-id="@item.Id" class="btn btn-success btn-sm">Check-Out</a>
                     }
                 </td>

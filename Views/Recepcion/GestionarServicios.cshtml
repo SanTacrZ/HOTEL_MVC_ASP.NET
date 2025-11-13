@@ -1,0 +1,219 @@
+@model biblioteca_hotel.Clases.Reserva
+
+@{
+    ViewData["Title"] = "Gestionar Servicios Adicionales";
+    var serviciosAdicionales = ViewBag.ServiciosAdicionales as List<biblioteca_hotel.Interfaces.IFacturable>;
+    var costoTotal = (decimal)ViewBag.CostoTotal;
+    var habitacionesConBata = ViewBag.HabitacionesConBata as List<biblioteca_hotel.Clases.Habitacion>;
+}
+
+<h2>Gestionar Servicios Adicionales</h2>
+<h4>Reserva #@Model.Id - Cliente: @Model.Cliente?.Nombre @Model.Cliente?.Apellido</h4>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Servicios Registrados -->
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5><i class="bi bi-list-check"></i> Servicios Registrados</h5>
+            </div>
+            <div class="card-body">
+                @if (serviciosAdicionales != null && serviciosAdicionales.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Fecha</th>
+                                <th>Costo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < serviciosAdicionales.Count; i++)
+                            {
+                                var servicio = serviciosAdicionales[i];
+                                <tr>
+                                    <td>@servicio.ObtenerDescripcion()</td>
+                                    <td>@servicio.ObtenerFecha().ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@servicio.CalcularCosto().ToString("C")</td>
+                                    <td>
+                                        <form asp-action="EliminarServicio" method="post" style="display:inline;">
+                                            <input type="hidden" name="reservaId" value="@Model.Id" />
+                                            <input type="hidden" name="indiceServicio" value="@i" />
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este servicio?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="2" class="text-end">Total Servicios:</td>
+                                <td colspan="2">@costoTotal.ToString("C")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted">No se han registrado servicios adicionales para esta reserva.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Formularios para agregar servicios -->
+    <div class="col-md-6">
+        <!-- Lavandería -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="bi bi-droplet"></i> Servicio de Lavandería</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="AgregarLavanderia" method="post">
+                    <input type="hidden" name="reservaId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" name="descripcion" class="form-control" placeholder="Ej: Lavado de camisas" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad de Prendas</label>
+                        <input type="number" name="cantidadPrendas" class="form-control" min="1" value="1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Precio por Prenda</label>
+                        <input type="number" name="precioPorPrenda" class="form-control" step="0.01" min="0" value="15000" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle"></i> Agregar Lavandería
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Restaurante -->
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5><i class="bi bi-cup-hot"></i> Servicio de Restaurante</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="AgregarRestaurante" method="post">
+                    <input type="hidden" name="reservaId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Comida</label>
+                        <select name="tipoComidaNombre" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Desayuno">Desayuno</option>
+                            <option value="Almuerzo">Almuerzo</option>
+                            <option value="Cena">Cena</option>
+                            <option value="Snack">Snack</option>
+                            <option value="Bebida">Bebida</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" name="cantidad" class="form-control" min="1" value="1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Precio Unitario</label>
+                        <input type="number" name="precioUnitario" class="form-control" step="0.01" min="0" value="25000" required />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-plus-circle"></i> Agregar Restaurante
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Venta de Batas -->
+        @if (habitacionesConBata != null && habitacionesConBata.Any())
+        {
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="bi bi-person-square"></i> Venta de Batas</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AgregarBata" method="post">
+                        <input type="hidden" name="reservaId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label class="form-label">Habitación</label>
+                            <select name="habitacionId" class="form-select" required>
+                                <option value="">Seleccione habitación...</option>
+                                @foreach (var hab in habitacionesConBata)
+                                {
+                                    <option value="@hab.Id">Habitación @hab.Numero - @hab.Tipo</option>
+                                }
+                            </select>
+                            <small class="text-muted">Solo habitaciones Suite y Ejecutiva pueden vender batas</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Talla</label>
+                            <select name="talla" class="form-select" required>
+                                <option value="">Seleccione talla...</option>
+                                <option value="S">S (Pequeña)</option>
+                                <option value="M">M (Mediana)</option>
+                                <option value="L">L (Grande)</option>
+                                <option value="XL">XL (Extra Grande)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" name="cantidad" class="form-control" min="1" max="5" value="1" required />
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-plus-circle"></i> Agregar Bata
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Esta reserva no tiene habitaciones con servicio de venta de batas (Suite o Ejecutiva).
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a Recepción
+    </a>
+    <a asp-action="GestionarMinibar" asp-route-habitacionId="@Model.Habitaciones.FirstOrDefault()?.Id" class="btn btn-info">
+        <i class="bi bi-cup-straw"></i> Gestionar Minibar
+    </a>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header h5 {
+        margin: 0;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+</style>

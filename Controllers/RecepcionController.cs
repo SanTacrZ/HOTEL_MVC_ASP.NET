@@ -9,6 +9,7 @@ namespace hotel_web_final.Controllers
         private readonly RecepcionService _recepcionService;
         private readonly ReservaService _reservaService;
         private readonly MinibarService _minibarService;
+        private readonly ServicioAdicionalService _servicioAdicionalService;
         private readonly NotificacionService _notificacionService;
         private readonly ILogger<RecepcionController> _logger;
 
@@ -16,12 +17,14 @@ namespace hotel_web_final.Controllers
             RecepcionService recepcionService,
             ReservaService reservaService,
             MinibarService minibarService,
+            ServicioAdicionalService servicioAdicionalService,
             NotificacionService notificacionService,
             ILogger<RecepcionController> logger)
         {
             _recepcionService = recepcionService;
             _reservaService = reservaService;
             _minibarService = minibarService;
+            _servicioAdicionalService = servicioAdicionalService;
             _notificacionService = notificacionService;
             _logger = logger;
         }
@@ -258,6 +261,118 @@ namespace hotel_web_final.Controllers
                 TempData["Error"] = $"Error al enviar la factura: {ex.Message}";
                 _logger.LogError(ex, "Error al enviar factura por correo");
                 return RedirectToAction(nameof(VerFactura), new { id });
+            }
+        }
+
+        // ===== GESTIÓN DE SERVICIOS ADICIONALES =====
+
+        /// <summary>
+        /// Muestra la página para agregar servicios adicionales a una reserva.
+        /// </summary>
+        public IActionResult GestionarServicios(int reservaId)
+        {
+            try
+            {
+                var reserva = _reservaService.BuscarPorId(reservaId);
+                if (reserva == null)
+                {
+                    TempData["Error"] = "Reserva no encontrada";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ViewBag.ReservaId = reservaId;
+                ViewBag.ServiciosAdicionales = _servicioAdicionalService.ObtenerServiciosPorReserva(reservaId);
+                ViewBag.CostoTotal = _servicioAdicionalService.CalcularCostoTotalServicios(reservaId);
+                ViewBag.HabitacionesConBata = _servicioAdicionalService.ObtenerHabitacionesConVentaBata(reservaId);
+
+                return View(reserva);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                _logger.LogError(ex, "Error al gestionar servicios adicionales");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        /// <summary>
+        /// Agrega un servicio de lavandería a una reserva.
+        /// </summary>
+        [HttpPost]
+        public IActionResult AgregarLavanderia(int reservaId, string descripcion, int cantidadPrendas, decimal precioPorPrenda)
+        {
+            try
+            {
+                _servicioAdicionalService.AgregarServicioLavanderia(reservaId, descripcion, cantidadPrendas, precioPorPrenda);
+                TempData["Mensaje"] = "Servicio de lavandería agregado exitosamente";
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                _logger.LogError(ex, "Error al agregar servicio de lavandería");
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+        }
+
+        /// <summary>
+        /// Agrega un servicio de restaurante a una reserva.
+        /// </summary>
+        [HttpPost]
+        public IActionResult AgregarRestaurante(int reservaId, string tipoComidaNombre, int cantidad, decimal precioUnitario)
+        {
+            try
+            {
+                var tipoComida = new TipoComida { Nombre = tipoComidaNombre };
+                _servicioAdicionalService.AgregarServicioRestaurante(reservaId, tipoComida, cantidad, precioUnitario);
+                TempData["Mensaje"] = "Servicio de restaurante agregado exitosamente";
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                _logger.LogError(ex, "Error al agregar servicio de restaurante");
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+        }
+
+        /// <summary>
+        /// Agrega venta de bata a una reserva.
+        /// </summary>
+        [HttpPost]
+        public IActionResult AgregarBata(int reservaId, int habitacionId, string talla, int cantidad)
+        {
+            try
+            {
+                _servicioAdicionalService.AgregarVentaBata(reservaId, habitacionId, talla, cantidad);
+                TempData["Mensaje"] = "Bata agregada exitosamente";
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                _logger.LogError(ex, "Error al agregar bata");
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+        }
+
+        /// <summary>
+        /// Elimina un servicio adicional de una reserva.
+        /// </summary>
+        [HttpPost]
+        public IActionResult EliminarServicio(int reservaId, int indiceServicio)
+        {
+            try
+            {
+                _servicioAdicionalService.EliminarServicio(reservaId, indiceServicio);
+                TempData["Mensaje"] = "Servicio eliminado exitosamente";
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                _logger.LogError(ex, "Error al eliminar servicio");
+                return RedirectToAction(nameof(GestionarServicios), new { reservaId });
             }
         }
     }

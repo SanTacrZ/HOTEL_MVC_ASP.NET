@@ -81,13 +81,22 @@ namespace hotel_web_final.Servicios
             detalleObservaciones.AppendLine($"Total de noches: {noches}");
             detalleObservaciones.AppendLine();
 
-            // DETALLE DE HABITACIONES
+            // DETALLE DE HABITACIONES (Cobro por huésped y días)
             detalleObservaciones.AppendLine("--- HABITACIONES ---");
+            detalleObservaciones.AppendLine($"Número de huéspedes: {reserva.NumHuespedes}");
             foreach (var habitacion in reserva.Habitaciones)
             {
-                decimal costoHabitacion = habitacion.PrecioPorNoche * noches;
+                // IMPORTANTE: Cobro por número de huéspedes y días
+                // El costo base es por habitación por noche
+                // Pero se multiplica por el número de huéspedes si hay más de uno
+                decimal factorHuespedes = reserva.NumHuespedes > 0 ? reserva.NumHuespedes : 1;
+                decimal costoBase = habitacion.PrecioPorNoche * noches;
+                decimal costoHabitacion = costoBase * factorHuespedes;
+
                 subtotal += costoHabitacion;
-                detalleObservaciones.AppendLine($"• Habitación {habitacion.Numero} ({habitacion.Tipo}): {habitacion.PrecioPorNoche:C} x {noches} noches = {costoHabitacion:C}");
+                detalleObservaciones.AppendLine($"• Habitación {habitacion.Numero} ({habitacion.Tipo}):");
+                detalleObservaciones.AppendLine($"  - Precio base: {habitacion.PrecioPorNoche:C} x {noches} noches = {costoBase:C}");
+                detalleObservaciones.AppendLine($"  - Multiplicado por {factorHuespedes} huésped(es) = {costoHabitacion:C}");
             }
             detalleObservaciones.AppendLine($"Subtotal Habitaciones: {subtotal:C}");
             detalleObservaciones.AppendLine();
@@ -123,6 +132,27 @@ namespace hotel_web_final.Servicios
             }
             detalleObservaciones.AppendLine();
 
+            // DETALLE DE SERVICIOS ADICIONALES (Batas, Lavandería, Restaurante)
+            decimal costoServiciosAdicionales = 0;
+            var hayServicios = reserva.ServiciosAdicionales != null && reserva.ServiciosAdicionales.Any();
+
+            detalleObservaciones.AppendLine("--- SERVICIOS ADICIONALES ---");
+            if (hayServicios)
+            {
+                foreach (var servicio in reserva.ServiciosAdicionales!)
+                {
+                    decimal costoServicio = servicio.CalcularCosto();
+                    costoServiciosAdicionales += costoServicio;
+                    detalleObservaciones.AppendLine($"  • {servicio.ObtenerDescripcion()} - {servicio.ObtenerFecha():dd/MM/yyyy} = {costoServicio:C}");
+                }
+                detalleObservaciones.AppendLine($"Subtotal Servicios Adicionales: {costoServiciosAdicionales:C}");
+            }
+            else
+            {
+                detalleObservaciones.AppendLine("No se registraron servicios adicionales");
+            }
+            detalleObservaciones.AppendLine();
+
             // CARGOS ADICIONALES
             decimal seguro = subtotal * 0.025m;
             decimal iva = 0;
@@ -145,7 +175,7 @@ namespace hotel_web_final.Servicios
             detalleObservaciones.AppendLine();
 
             // TOTAL
-            factura.MontoTotal = subtotal + seguro + iva + costoMinibar;
+            factura.MontoTotal = subtotal + seguro + iva + costoMinibar + costoServiciosAdicionales;
             detalleObservaciones.AppendLine("=========================");
             detalleObservaciones.AppendLine($"TOTAL A PAGAR: {factura.MontoTotal:C}");
 

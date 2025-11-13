@@ -43,6 +43,7 @@ namespace hotel_web_final
             // Servicios que dependen de otros servicios
             builder.Services.AddSingleton<ReservaService>();        // Depende de Habitacion, Cliente, Huesped, Auditoria
             builder.Services.AddSingleton<RecepcionService>();      // Depende de Reserva, Hotel, Auditoria
+            builder.Services.AddSingleton<ServicioAdicionalService>(); // Depende de Reserva, Habitacion, Auditoria
 
             var app = builder.Build();
 

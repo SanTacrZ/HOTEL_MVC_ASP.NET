@@ -24,8 +24,6 @@ namespace hotel_web_final.Servicios
             var tipoCamaKing = new TipoCama { Id = 4, Nombre = "King" };
             var tipoCamaSemidoble = new TipoCama { Id = 5, Nombre = "Semidoble" };
 
-            int numeroHabitacion = 1;
-
             for (int piso = 2; piso <= 4; piso++)
             {
                 for (int i = 1; i <= 10; i++)
